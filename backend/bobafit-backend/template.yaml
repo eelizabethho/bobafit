@@ -11,31 +11,46 @@ Globals:
     Timeout: 3
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  NutritionFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      CodeUri: hello_world/
+      CodeUri: nutrition_api/
       Handler: app.lambda_handler
       Runtime: python3.12
       Architectures:
         - x86_64
+      Timeout: 30
+      Environment:
+        Variables:
+          CALORIENINJAS_API_KEY: !Ref CalorieNinjasApiKey
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        NutritionApi:
+          Type: Api
           Properties:
-            Path: /hello
+            Path: /nutrition
             Method: get
+        NutritionApiPost:
+          Type: Api
+          Properties:
+            Path: /nutrition
+            Method: post
+        NutritionApiOptions:
+          Type: Api
+          Properties:
+            Path: /nutrition
+            Method: options
+
+Parameters:
+  CalorieNinjasApiKey:
+    Type: String
+    Default: ""
+    Description: "CalorieNinjas API Key (optional, leave empty for mock data)"
+    NoEcho: true
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  NutritionApi:
+    Description: "API Gateway endpoint URL for Prod stage for Nutrition function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/Prod/nutrition"
+  NutritionFunction:
+    Description: "Nutrition Lambda Function ARN"
+    Value: !GetAtt NutritionFunction.Arn
